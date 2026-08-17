@@ -1,3 +1,29 @@
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const menuButton = document.querySelector('.menu-button');
+const nav = document.querySelector('.nav');
+
+menuButton.addEventListener('click', () => {
+  const open = nav.classList.toggle('open');
+  menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+document.querySelectorAll('.nav a').forEach(a =>
+  a.addEventListener('click', () => nav.classList.remove('open'))
+);
+
+const observer = new IntersectionObserver(entries =>
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');
+      observer.unobserve(entry.target);
+    }
+  }),
+  { threshold: .12 }
+);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
 const form = document.getElementById('quoteForm');
 
 form.addEventListener('submit', e => {
@@ -5,22 +31,17 @@ form.addEventListener('submit', e => {
 
   const d = new FormData(form);
 
-  const message =
-`Hi Peppys LTD,
+  const subject = `Website quote request - ${d.get('service') || 'Peppys LTD'}`;
 
-I'd like a free quote.
+  const body =
+    `Hi Peppys LTD,%0D%0A%0D%0A` +
+    `Name: ${encodeURIComponent(d.get('name') || '')}%0D%0A` +
+    `Phone: ${encodeURIComponent(d.get('phone') || '')}%0D%0A` +
+    `Email: ${encodeURIComponent(d.get('email') || '')}%0D%0A` +
+    `Service: ${encodeURIComponent(d.get('service') || '')}%0D%0A` +
+    `Area: ${encodeURIComponent(d.get('area') || '')}%0D%0A%0D%0A` +
+    `Job details:%0D%0A${encodeURIComponent(d.get('message') || '')}`;
 
-Name: ${d.get('name') || ''}
-Phone: ${d.get('phone') || ''}
-Email: ${d.get('email') || ''}
-Service: ${d.get('service') || ''}
-Area/Postcode: ${d.get('area') || ''}
-
-Job details:
-${d.get('message') || ''}`;
-
-  const whatsappURL =
-    `https://wa.me/447902409746?text=${encodeURIComponent(message)}`;
-
-  window.open(whatsappURL, '_blank');
+  window.location.href =
+    `mailto:Peppysgeneralcleaning@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
